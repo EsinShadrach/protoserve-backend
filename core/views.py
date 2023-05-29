@@ -1,23 +1,32 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from core.models import CustomUser, Education, Experiences, Project
+from core import serializers
+from core.models import CustomUser, Education, Experiences, Person, Project
 from django.db.models import Q
-from core.serializers import EducationSerializer, ExperienceSerializer, ProjectSerializer, UserSerializer
+from core.serializers import EducationSerializer, ExperienceSerializer, PersonSerializer, ProjectSerializer, UserSerializer
 # Create your views here.
 
-
+# ! YOU SHOULD ONLY BE ABLE TO SEE YOUR OWN DATA SO RESTRICTED VIEWS
 @api_view(['GET'])
 def endpoints(request) -> Response:
+    link = 'http://127.0.0.1:8000'
     endpoint_list: list[str] = [
-        '/education',
+        f'{link}/educations/',
         '/education/:school_name',
-        '/experience',
+        
+        f'{link}/experience',
         '/experiences/:name',
-        '/projects',
+        
+        f'{link}/projects',
         '/projects/:project_name',
-        # ! THESE BELOW WOULD BE HIDDEN
-        'user',
+        
+        # ! PEOPLE WOULD BE HIDDEN BUT NOT `PERSON`
+        f'{link}/people',
+        'person/:id',
+           
+        # ! USER WOULD BE HIDDEN
+        f'{link}/user',
         '/user/:first_name'
     ]
     return Response(endpoint_list)
@@ -29,7 +38,7 @@ def users(request) -> Response | None:
         query = request.GET.get('query')
         if query == None:
             query: str = ''
-
+            
         users = CustomUser.objects.filter(
             Q(name__icontains=query) |
             Q(first_name__icontains=query) |
@@ -69,7 +78,7 @@ def experiences(request) -> Response | None:
 
 @api_view(["GET", "PUT", "DELETE"])  # ! ADDING ABILITY TO GET PUT AND DELETE
 def experiencesDetails(request, name) -> Response | None:
-    experiences = Experiences.objects.get(name=name)
+    experiences: Experiences = Experiences.objects.get(name=name)
     if request.method == "GET":
         serializer = ExperienceSerializer(experiences, many=False)
         return Response(serializer.data)
@@ -124,3 +133,15 @@ def projectDetailed(request, project_name) -> Response | None:
     if request.method == "GET":
         serializer = ProjectSerializer(project, many=False)
         return Response(serializer.data)
+
+@api_view(["GET"])
+def person(request, id) -> Response:
+    person: Person = Person.objects.get(id=id)
+    serializer = PersonSerializer(person, many=False)
+    return Response(serializer.data)
+
+@api_view(["GET"])
+def people(request) -> Response:
+    person = Person.objects.all()
+    serializer = PersonSerializer(person, many=True)
+    return Response(serializer.data)

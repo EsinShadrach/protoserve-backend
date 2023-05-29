@@ -102,3 +102,13 @@ class Project(models.Model):
     class Meta:
         verbose_name_plural: str = "Projects"
         ordering: list[str] = ['-updated', '-date_added']
+
+class Person(models.Model):
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
+    experience =  models.ForeignKey(Experiences, on_delete=models.SET_NULL, null=True, blank=True)
+    education = models.ForeignKey(Education, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    def __str__(self) -> str:
+        person: CustomUser = self.owner
+        return f"{person.first_name} {person.last_name}"
