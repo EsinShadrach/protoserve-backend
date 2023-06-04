@@ -3,9 +3,10 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager, Permission
 from django.utils import timezone
 
 
-YEAR_CHOICES:list[tuple[str | str]] = [
+YEAR_CHOICES: list[tuple[str | str]] = [
     (str(year), str(year)) for year in range(1950, 2100)
 ]
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -32,8 +33,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     contact = models.JSONField(default=dict)
     social_links = models.JSONField(default=list)
     skills = models.JSONField(default=list)
-    intro_text = models.CharField(max_length=200, blank=True)
-    blog = models.CharField(max_length=150, blank=True)
+    intro_text = models.CharField(max_length=200, blank=True, null=True)
+    blog = models.CharField(max_length=150, blank=True, null=True)
     # TODO: ADD PROFILE PIC FIELD HERE
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -43,6 +44,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS: list[str] = ['first_name', 'last_name']
 
     objects = CustomUserManager()
+
+    def save(self, *args, **kwargs):
+        self.name = f"{self.first_name} {self.last_name}".title()
+        self.first_name.lower()
+        self.first_name = self.first_name.lower()
+        self.last_name = self.last_name.lower()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        self.first_name = self.first_name.lower()
+        self.last_name = self.last_name.lower()
+        super().clean()
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
@@ -74,7 +87,8 @@ class Education(models.Model):
     end_year = models.CharField(max_length=4, blank=True, choices=YEAR_CHOICES)
     degree = models.CharField(max_length=200)
     course = models.CharField(max_length=200)
-    activities_societies = models.JSONField(default=list, blank=True, null=True)
+    activities_societies = models.JSONField(
+        default=list, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.school_name
@@ -102,13 +116,3 @@ class Project(models.Model):
     class Meta:
         verbose_name_plural: str = "Projects"
         ordering: list[str] = ['-updated', '-date_added']
-
-class Person(models.Model):
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
-    experience =  models.ForeignKey(Experiences, on_delete=models.SET_NULL, null=True, blank=True)
-    education = models.ForeignKey(Education, on_delete=models.SET_NULL, null=True, blank=True)
-    
-    def __str__(self) -> str:
-        person: CustomUser = self.owner
-        return f"{person.first_name} {person.last_name}"

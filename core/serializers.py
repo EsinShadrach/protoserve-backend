@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import CustomUser, Education, Experiences, Person, Project
+from core.models import CustomUser, Education, Experiences, Project
 
 # ! REMOVE OWNER FOR ALL FIELDS IN PRODUCTION MODE
 
@@ -8,7 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         exclude: list[str] = [
-            'password',
+            # 'password',
             'is_active',
             'user_permissions',
             'groups',
@@ -55,14 +55,4 @@ class ProjectSerializer(serializers.ModelSerializer):
         ownerInstance: CustomUser = instance.owner
         return f"{ownerInstance.first_name} {ownerInstance.last_name}"
 
-
-class PersonSerializer(serializers.ModelSerializer):
-    owner = UserSerializer()
-    project = ProjectSerializer()
-    experience = ExperienceSerializer()
-    education = EducationSerializer()
-
-    class Meta:
-        model = Person
-        fields = '__all__'
 

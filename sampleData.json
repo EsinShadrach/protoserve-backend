@@ -1,0 +1,37 @@
+[
+	{
+		"is_superuser": true,
+		"email": "esinshadrachrafe@gmail.com",
+		"name": "",
+		"first_name": "Esin",
+		"last_name": "Shadrach",
+		"about": "",
+		"contact": {},
+		"social_links": [],
+		"skills": [],
+		"intro_text": null,
+		"blog": null
+	},
+	{
+		"owner": "",
+		"name": "Krubbs",
+		"role": "frontend dev",
+		"start_year": "2022",
+		"end_year": "",
+		"skill": ["React", "TailwindCSS"],
+		"about_company": "I worked as a front end dev at krubbs"
+	},
+    {
+		"is_superuser": true,
+		"email": "azrahkabir@gmail.com",
+		"name": "",
+		"first_name": "Azrah",
+		"last_name": "Kabir",
+		"about": "I am a fraud",
+		"contact": {},
+		"social_links": [],
+		"skills": ["painting"],
+		"intro_text": "Hi, I'm azrah kabir and I'm a fraud",
+		"blog": null
+	}
+]
